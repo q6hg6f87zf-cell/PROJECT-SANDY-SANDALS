@@ -2092,11 +2092,14 @@ function renderPlayerModal() {
   <div style="display:flex; gap:6px; margin-top:10px; margin-bottom:12px"> 
     <input class="input" style="flex:1" id="inv-add-${p.id}" placeholder="Item name..."> 
     <select class="select" id="inv-cat-${p.id}" style="width:90px">
+          <select class="select" id="inv-cat-${p.id}" style="width:90px">
       <option value="weapon">Weapon</option>
+      <option value="armor">Armor</option>
       <option value="enchantment">Enchant</option>
       <option value="item">Item</option>
       <option value="misc">Misc</option>
     </select>
+
     <button class="btn btn-sm btn-green" onclick="addInvItem(${p.id})">Add</button> 
   </div> 
 
