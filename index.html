@@ -1955,9 +1955,9 @@ function renderPlayerModal() {
   const stats = getPlayerStats(p);
   const FULL = {STR:'Strength', DEF:'Defense', INT:'Intelligence', WIS:'Wisdom', SPD:'Speed', CHA:'Charisma', LCK:'Luck'};
   
-  // 1. Group the inventory items safely
+    // 1. Group the inventory items safely
   let invHTML = '';
-  const categories = ['weapon', 'enchantment', 'item', 'misc'];
+  const categories = ['weapon', 'armor', 'enchantment', 'item', 'misc'];
   categories.forEach(cat => {
     const catItems = (p.inventory || []).map((item, i) => ({item, index: i})).filter(x => {
       if (typeof x.item === 'string') return cat === 'misc';
@@ -1968,14 +1968,22 @@ function renderPlayerModal() {
       invHTML += `<div style="font-size:0.6rem; color:var(--gold); text-transform:uppercase; margin-top:8px; margin-bottom:2px; letter-spacing:1px">${cat}s</div>`;
       catItems.forEach(x => {
         const name = typeof x.item === 'string' ? x.item : x.item.name;
+        const isEquipped = x.item.equipped;
+        const equipColor = isEquipped ? 'var(--green)' : 'var(--dim)';
+        const equipLabel = isEquipped ? '✓ Equipped' : 'Equip';
+
         invHTML += `
-          <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.74rem; color:#bbb; font-family:Arial,sans-serif">
-            <span>${esc(name)}</span>
-            <button onclick="rmInvItem(${p.id},${x.index})" style="background:none; border:none; color:var(--dim); cursor:pointer">✕</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 4px; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.74rem; color:${isEquipped ? '#fff' : '#bbb'}; font-family:Arial,sans-serif; background:${isEquipped ? 'rgba(102,187,106,0.1)' : 'transparent'}; border-radius:4px;">
+            <span style="flex:1">${esc(name)}</span>
+            <div style="display:flex; gap:8px;">
+                ${['weapon', 'armor', 'enchantment'].includes(cat) ? `<button onclick="toggleEquip(${p.id},${x.index})" style="background:none; border:1px solid ${equipColor}; color:${equipColor}; border-radius:4px; font-size:0.6rem; padding:2px 6px; cursor:pointer">${equipLabel}</button>` : ''}
+                <button onclick="rmInvItem(${p.id},${x.index})" style="background:none; border:none; color:var(--red); cursor:pointer; padding:0 4px">✕</button>
+            </div>
           </div>`;
       });
     }
   });
+
 
   // 2. Logic for Arc Progression
   const adv = p.advancement || { raids: 0, battles: 0 };
