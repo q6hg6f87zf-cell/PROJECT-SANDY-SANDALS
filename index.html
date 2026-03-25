@@ -3418,6 +3418,27 @@ function rmInvItem(playerId, index) {
     saveAll(); render(); 
   }
 }
+function toggleEquip(playerId, index) {
+  const p = STATE.players.find(x => x.id === playerId);
+  if(!p || !p.inventory[index]) return;
+  
+  const item = p.inventory[index];
+  
+  // If we are equipping this item, auto-unequip any other item of the same type
+  if (!item.equipped) {
+      p.inventory.forEach(i => {
+          if (i.type === item.type) i.equipped = false;
+      });
+  }
+  
+  // Toggle the state
+  item.equipped = !item.equipped;
+  
+  if(STATE.sessionActive) {
+      addLog({type:'item', who:p.charname, what:`${item.equipped ? 'Equipped' : 'Unequipped'} ${item.name}`});
+  }
+  saveAll(); render();
+}
 
 function addConsequence(playerId, type, label) {
   const p = STATE.players.find(x => x.id === playerId);
