@@ -2064,7 +2064,8 @@ function renderPlayerModal() {
       <span style="font-size:0.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif">Hit Points</span> 
       <span style="font-size:1.1rem;font-weight:bold;color:${hc};font-family:Arial,sans-serif">${p.hp}<span style="font-size:0.7rem;color:var(--dim)"> / ${p.maxHp}</span></span> 
     </div> 
-    <div class="hp-bar-wrap" style="height:10px;margin-bottom:8px"><div class="hp-bar" style="width:${pct}%;background:${hc};box-shadow:0 0 10px ${hc}"></div></div> 
+     ${renderHearts(p.hp, p.maxHp)}
+
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px"> 
       ${[-5,-3,-2,-1].map(d=>`<button class="btn btn-sm btn-red" onclick="adjHP(${p.id},${d});render()">${d}</button>`).join('')} 
       <div style="flex:1"></div> 
