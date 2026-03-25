@@ -1662,21 +1662,44 @@ function getPlayerStats(p) {
   const raceStats = p.race && RACES[p.race] ? RACES[p.race].stats : {STR:0,DEF:0,INT:0,WIS:0,SPD:0,CHA:0,LCK:0};
   const primary = PRIMARY_STAT[p.cls] || "STR";
   
+  // ✦ NEW: Calculate Gear Bonuses
+  let gearDefBonus = 0;
+  let gearSpdBonus = 0;
+  
+  if (p.inventory) {
+    p.inventory.forEach(invItem => {
+      if (invItem.equipped) {
+        // Look up Armor Stats
+        for (const cls in ARSENAL_ARMOR) {
+          const foundArmor = ARSENAL_ARMOR[cls].find(a => a.name === invItem.name);
+          if (foundArmor) {
+            const defMatch = foundArmor.defense.match(/\+(\d+)\s+DEF/);
+            if (defMatch) gearDefBonus += parseInt(defMatch[1]);
+            if (foundArmor.effect.includes("-1 SPD")) gearSpdBonus -= 1;
+            if (foundArmor.effect.includes("-2 SPD")) gearSpdBonus -= 2;
+          }
+        }
+      }
+    });
+  }
+  
   let finalStats = {};
   for (let s in base) {
      let calc = base[s] + raceStats[s] + (s === primary ? traitBonus : 0);
      
-     // ✦ Add Companion Buff (Only if Active)
+     if (s === 'DEF') calc += gearDefBonus;
+     if (s === 'SPD') calc += gearSpdBonus;
+     
      if (p.companion && p.companion.status === 'active') {
        const cData = COMPANION_TYPES[p.companion.type];
        if (cData.statBuff && cData.statBuff[s]) calc += cData.statBuff[s];
      }
 
-     // Use GM Override if it exists, otherwise use the calculated math
      finalStats[s] = (p.statOverrides && p.statOverrides[s] !== undefined) ? p.statOverrides[s] : calc;
   }
   return finalStats;
 }
+
 
 
 function rangeLabel(r) { return r[0] === r[1] ? String(r[0]) : r[0]+'-'+r[1]; }
